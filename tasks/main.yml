@@ -8,16 +8,28 @@
     src: "{{ customize.file.name }}"
     dest: "{{ customize.file.dest_path }}"
 
-- name: "Auto start ssh-agent | set customize settings"
+- name: "Auto start ssh-agent | inform file path is not defined"
+  become: yes
+  ignore_errors: yes
+  debug:
+    msg: "A variable 'ansible_inventory_ssh_keys_list_file_path' is not defined. But this is not an error."
+  when: ansible_inventory_ssh_keys_list_file_path is not defined
+
+- name: "Auto start ssh-agent | export file path"
   ignore_errors: "{{ ansible_check_mode }}"
   shell:
     cmd: |
       cat "{{ shell.rc.file.path }}" | grep "export SSH_KEYS_LIST_FILE_PATH=" >/dev/null
       if [ $? -ne 0 ]; then
           echo -n "\n" >> "{{ shell.rc.file.path }}"
-          echo "export SSH_KEYS_LIST_FILE_PATH=\"{{ ssh.keys.list.file.path }}\"" >> "{{ shell.rc.file.path }}"
+          echo "export SSH_KEYS_LIST_FILE_PATH=\"{{ ansible_inventory_ssh_keys_list_file_path }}\"" >> "{{ shell.rc.file.path }}"
       fi
+  when: ansible_inventory_ssh_keys_list_file_path is defined
 
+- name: "Auto start ssh-agent | set customize settings"
+  ignore_errors: "{{ ansible_check_mode }}"
+  shell:
+    cmd: |
       cat "{{ shell.rc.file.path }}" | grep ". {{ customize.file.dest_path }}" >/dev/null
       if [ $? -ne 0 ]; then
           echo ". {{ customize.file.dest_path }}" >> "{{ shell.rc.file.path }}"

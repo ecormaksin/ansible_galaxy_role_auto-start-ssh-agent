@@ -10,9 +10,3 @@ shell:
   rc:
     file:
       path: $HOME/.bashrc
-
-ssh:
-  keys:
-    list:
-      file:
-        path: <set_your_own>
