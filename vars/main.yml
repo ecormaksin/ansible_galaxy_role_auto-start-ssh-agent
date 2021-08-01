@@ -1,0 +1,18 @@
+---
+# vars file for ansible_galaxy_role_auto-start-ssh-agent
+
+customize:
+  file:
+    name: auto_start_ssh-agent
+    dest_path: /etc/auto_start_ssh-agent
+
+shell:
+  rc:
+    file:
+      path: $HOME/.bashrc
+
+ssh:
+  keys:
+    list:
+      file:
+        path: <set_your_own>

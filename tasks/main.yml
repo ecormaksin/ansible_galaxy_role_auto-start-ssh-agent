@@ -1,0 +1,24 @@
+---
+# tasks file for ansible_galaxy_role_auto-start-ssh-agent
+
+- name: "Auto start ssh-agent | copy file"
+  become: yes
+  ignore_errors: "{{ ansible_check_mode }}"
+  copy:
+    src: "{{ customize.file.name }}"
+    dest: "{{ customize.file.dest_path }}"
+
+- name: "Auto start ssh-agent | set customize settings"
+  ignore_errors: "{{ ansible_check_mode }}"
+  shell:
+    cmd: |
+      cat "{{ shell.rc.file.path }}" | grep "export SSH_KEYS_LIST_FILE_PATH=" >/dev/null
+      if [ $? -ne 0 ]; then
+          echo -n "\n" >> "{{ shell.rc.file.path }}"
+          echo "export SSH_KEYS_LIST_FILE_PATH=\"{{ ssh.keys.list.file.path }}\"" >> "{{ shell.rc.file.path }}"
+      fi
+
+      cat "{{ shell.rc.file.path }}" | grep ". {{ customize.file.dest_path }}" >/dev/null
+      if [ $? -ne 0 ]; then
+          echo ". {{ customize.file.dest_path }}" >> "{{ shell.rc.file.path }}"
+      fi
